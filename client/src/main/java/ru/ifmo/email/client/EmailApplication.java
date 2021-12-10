@@ -17,7 +17,7 @@ public class EmailApplication extends Application {
         validateEmail(email);
 
         // Здесь должна быть ваша реализация клиента, вместо mock.
-        final EmailClient emailClient = new EmailClientMock(email);
+        final EmailClient emailClient = new EmailClient1(email);
         emailClient.registerMyEmail(email);
 
 

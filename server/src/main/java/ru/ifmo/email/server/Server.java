@@ -1,6 +1,7 @@
 package ru.ifmo.email.server;
 
 import ru.ifmo.email.communication.Command;
+import ru.ifmo.email.communication.Register;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -20,6 +22,8 @@ public class Server implements AutoCloseable {
             waite.waite();
         }
     }
+
+    private HashMap<String, Client> clients;
 
     private static class Waite{
 
@@ -49,7 +53,10 @@ public class Server implements AutoCloseable {
     private final String defaultPath = "c:\\Users\\U\\Documents\\java\\testSCP\\server\\";
 
     public Server(int port) {
+
         this.port = port;
+
+        clients = new HashMap<>();
     }
 
     public synchronized void start() {
@@ -129,6 +136,12 @@ public class Server implements AutoCloseable {
                 while (!isInterrupted()) {
                     final Command command = (Command) objIn.readObject();
                     //тут команды
+                    if (command instanceof Register register){
+                        String email = register.getEmail();
+                        System.out.println("register user: " + email);
+                        clients.put(email, new Client(email, socket.getInetAddress()));
+                    }
+                    interrupt();
                 }
 
             } catch (IOException e) {
