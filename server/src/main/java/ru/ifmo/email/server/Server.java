@@ -3,13 +3,11 @@ package ru.ifmo.email.server;
 import ru.ifmo.email.communication.*;
 import ru.ifmo.email.model.Message;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -125,22 +123,22 @@ public class Server implements AutoCloseable {
                         String email = register.getEmail();
                         if (clients.containsKey(email)){
                             System.out.println("error register user: " + email);
-                            final Command response = new Response(CodeResponse.error, "error register user: " + email);
+                            final Command response = new Response(CodeResponse.ERROR, "error register user: " + email);
                             objOut.writeObject(response);
                         } else {
                             System.out.println("register user: " + email);
                             clients.put(email, new Client(email, socket.getInetAddress()));
-                            final Command response = new Response(CodeResponse.ok, "");
+                            final Command response = new Response(CodeResponse.OK, "");
                             objOut.writeObject(response);
                         }
                     } else if (command instanceof SendEmail sendEmail){
                         String email = sendEmail.getRecipient();
                         if (clients.containsKey(email)){
                             clients.get(email).addMessage(sendEmail.getMessage());
-                            final Command response = new Response(CodeResponse.ok, "");
+                            final Command response = new Response(CodeResponse.OK, "");
                             objOut.writeObject(response);
                         } else {
-                            final Command response = new Response(CodeResponse.error, "user is not registered");
+                            final Command response = new Response(CodeResponse.ERROR, "user is not registered");
                             objOut.writeObject(response);
                         }
                     }
@@ -148,10 +146,10 @@ public class Server implements AutoCloseable {
                         String email = emails.getEmail();
                         if (clients.containsKey(email)){
                             List<Message> messages = clients.get(email).getMessages();
-                            final Command response = new Response(CodeResponse.ok, "", messages);
+                            final Command response = new Response(CodeResponse.OK, "", messages);
                             objOut.writeObject(response);
                         } else {
-                            final Command response = new Response(CodeResponse.error, "user is not registered");
+                            final Command response = new Response(CodeResponse.ERROR, "user is not registered");
                             objOut.writeObject(response);
                         }
                     }
