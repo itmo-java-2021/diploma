@@ -45,10 +45,7 @@ public class Server implements AutoCloseable {
         }
     }
 
-
-
     private final int port;
-    private final List<ConnectionServer> connections = new ArrayList<>();
     private ConnectionListener listener;
 
     public Server(int port) {
@@ -69,14 +66,6 @@ public class Server implements AutoCloseable {
             IOUtils.closeQuietly(listener);
             listener = null;
         }
-
-        // Выполняем копию, т.к. каждый остановленный поток автоматически удаляет себя из списка connections,
-        // а мы хотим выполнить join к каждому, чтобы дождаться, пока завершатся все потоки.
-        final var copyConnections = new ArrayList<>(connections);
-        copyConnections.forEach(IOUtils::closeQuietly);
-        for (ConnectionServer con : copyConnections) {
-            con.join();
-        }
     }
 
     @Override
@@ -96,9 +85,6 @@ public class Server implements AutoCloseable {
                     final Socket socket = ssocket.accept();
 
                     final ConnectionServer connectionServer = new ConnectionServer(socket);
-                    synchronized (connections) {
-                        connections.add(connectionServer);
-                    }
                     connectionServer.start();
                 }
             } catch (IOException e) {
@@ -177,9 +163,7 @@ public class Server implements AutoCloseable {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } finally {
-                synchronized (connections) {
-                    connections.remove(this);
-                }
+
             }
         }
 
