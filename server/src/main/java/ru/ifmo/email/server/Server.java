@@ -127,7 +127,7 @@ public class Server implements AutoCloseable {
                             objOut.writeObject(response);
                         } else {
                             System.out.println("register user: " + email);
-                            clients.put(email, new Client(email, socket.getInetAddress()));
+                            clients.put(email, new Client(email));
                             final Command response = new Response(CodeResponse.OK, "");
                             objOut.writeObject(response);
                         }

@@ -9,12 +9,10 @@ import java.util.List;
 
 public class Client {
     public final String email;
-    public final InetAddress addres;
     private final List<Message> messages;
 
-    public Client(String email, InetAddress addres) {
+    public Client(String email) {
         this.email = email;
-        this.addres = addres;
         this.messages = new ArrayList<Message>();
     }
 
