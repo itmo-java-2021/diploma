@@ -1,5 +1,7 @@
 package ru.ifmo.email.client;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import ru.ifmo.email.client.exception.EmailClientException;
 import ru.ifmo.email.communication.*;
 import ru.ifmo.email.model.Message;
@@ -25,24 +27,31 @@ public class EmailClient1 implements EmailClient{
     }
 
     @Override
-    public void registerMyEmail(String email) throws EmailClientException {
-        try {
-            Socket socket = new Socket(host, port);
-            ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
+    public void registerMyEmail(String email) throws EmailClientException, IOException, ClassNotFoundException {
+        Socket socket = new Socket(host, port);
+        ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
+        ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
 
-            Command command = new Register(user);
-            objOut.writeObject(command);
-            Command o = (Command) objIn.readObject();
-            if (o instanceof Response response){{
-                if (response.code() == CodeResponse.error){
-                    System.out.println(response.message());
-                }
-            }}
+        Command command = new Register(user);
+        objOut.writeObject(command);
+        Command o = (Command) objIn.readObject();
+        if (o instanceof Response response){{
+            if (response.code() == CodeResponse.ERROR){
+                System.out.println(response.message());
 
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("WARNING");
+                alert.setHeaderText("error register");
+                alert.setContentText(response.message());
+                alert.showAndWait().ifPresent(rs -> {
+                    if (rs == ButtonType.OK) {
+                        System.out.println("Pressed OK.");
+                    }
+                });
+
+                System.exit(1);
+            }
+        }}
     }
 
     @Override
@@ -57,7 +66,7 @@ public class EmailClient1 implements EmailClient{
             objOut.writeObject(command);
             Command o = (Command) objIn.readObject();
             if (o instanceof Response response){{
-                if (response.code() == CodeResponse.error){
+                if (response.code() == CodeResponse.ERROR){
                     System.out.println(response.message());
                 }
             }}
@@ -80,10 +89,10 @@ public class EmailClient1 implements EmailClient{
             Command o = (Command) objIn.readObject();
             if (o instanceof Response response){{
                 switch (response.code()) {
-                    case ok -> {
+                    case OK -> {
                         messages = (List<Message>) response.o();
                     }
-                    case error -> {
+                    case ERROR -> {
                         System.out.println(response.message());
                     }
                 }

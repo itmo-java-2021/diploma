@@ -3,6 +3,8 @@ package ru.ifmo.email.client;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import ru.ifmo.email.client.controller.EmailClientController;
 import ru.ifmo.email.client.exception.EmailClientException;
@@ -12,7 +14,7 @@ import java.io.IOException;
 
 public class EmailApplication extends Application {
     @Override
-    public void start(Stage stage) throws IOException, EmailClientException {
+    public void start(Stage stage) throws IOException, EmailClientException, ClassNotFoundException {
         final String email = getParameters().getNamed().get("email");
         validateEmail(email);
 
