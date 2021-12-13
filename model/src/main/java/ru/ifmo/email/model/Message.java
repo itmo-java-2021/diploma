@@ -1,6 +1,8 @@
 package ru.ifmo.email.model;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable {
     private String senderAddress;
     private String title;
     private String content;

@@ -1,7 +1,7 @@
 package ru.ifmo.email.server;
 
-import ru.ifmo.email.communication.Command;
-import ru.ifmo.email.communication.Register;
+import ru.ifmo.email.communication.*;
+import ru.ifmo.email.model.Message;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +50,6 @@ public class Server implements AutoCloseable {
     private final int port;
     private final List<ConnectionServer> connections = new ArrayList<>();
     private ConnectionListener listener;
-    private final String defaultPath = "c:\\Users\\U\\Documents\\java\\testSCP\\server\\";
 
     public Server(int port) {
 
@@ -138,8 +137,37 @@ public class Server implements AutoCloseable {
                     //тут команды
                     if (command instanceof Register register){
                         String email = register.getEmail();
-                        System.out.println("register user: " + email);
-                        clients.put(email, new Client(email, socket.getInetAddress()));
+                        if (clients.containsKey(email)){
+                            System.out.println("error register user: " + email);
+                            final Command response = new Response(CodeResponse.error, "error register user: " + email);
+                            objOut.writeObject(response);
+                        } else {
+                            System.out.println("register user: " + email);
+                            clients.put(email, new Client(email, socket.getInetAddress()));
+                            final Command response = new Response(CodeResponse.ok, "");
+                            objOut.writeObject(response);
+                        }
+                    } else if (command instanceof SendEmail sendEmail){
+                        String email = sendEmail.getRecipient();
+                        if (clients.containsKey(email)){
+                            clients.get(email).addMessage(sendEmail.getMessage());
+                            final Command response = new Response(CodeResponse.ok, "");
+                            objOut.writeObject(response);
+                        } else {
+                            final Command response = new Response(CodeResponse.error, "user is not registered");
+                            objOut.writeObject(response);
+                        }
+                    }
+                    else if (command instanceof LoadEmails emails){
+                        String email = emails.getEmail();
+                        if (clients.containsKey(email)){
+                            List<Message> messages = clients.get(email).getMessages();
+                            final Command response = new Response(CodeResponse.ok, "", messages);
+                            objOut.writeObject(response);
+                        } else {
+                            final Command response = new Response(CodeResponse.error, "user is not registered");
+                            objOut.writeObject(response);
+                        }
                     }
                     interrupt();
                 }
