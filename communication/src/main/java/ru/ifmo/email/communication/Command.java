@@ -1,5 +1,15 @@
 package ru.ifmo.email.communication;
 
-// Команда, которая будет использоваться для общения клиента и сервера.
-public interface Command {
+import ru.ifmo.email.model.User;
+
+public abstract class Command implements ICommand {
+    private final User user;
+
+    protected Command(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
+    }
 }

@@ -24,11 +24,32 @@
         <javafx.version>17-ea+11</javafx.version>
         <formx.version>11.4.2</formx.version>
         <ikoni-javafx.version>12.2.0</ikoni-javafx.version>
+        <postgres.version>42.3.1</postgres.version>
+        <c3p0.version>0.9.5.5</c3p0.version>
+        <hibernate.version>5.6.1.Final</hibernate.version>
     </properties>
 
     <dependencyManagement>
 
         <dependencies>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgres.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mchange</groupId>
+                <artifactId>c3p0</artifactId>
+                <version>${c3p0.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>ru.ifmo.email</groupId>
                 <artifactId>model</artifactId>

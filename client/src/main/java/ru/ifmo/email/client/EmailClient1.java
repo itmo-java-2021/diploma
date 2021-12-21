@@ -5,6 +5,7 @@ import javafx.scene.control.ButtonType;
 import ru.ifmo.email.client.exception.EmailClientException;
 import ru.ifmo.email.communication.*;
 import ru.ifmo.email.model.Message;
+import ru.ifmo.email.model.User;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,14 +17,15 @@ import java.util.List;
 public class EmailClient1 implements EmailClient{
     private final String host;
     private final int port;
-    private final String user;
+    private final User user;
 
     public EmailClient1(String email) {
         var s1 = email.split("@");
         var s2 = s1[1].split(":");
         this.host = s2[0];
         this.port = Integer.parseInt(s2[1]);
-        this.user = s1[0];
+        this.user = new User(s1[0], s1[0]);
+
     }
 
     @Override
@@ -32,9 +34,9 @@ public class EmailClient1 implements EmailClient{
         ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
         ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
 
-        Command command = new Register(user);
-        objOut.writeObject(command);
-        Command o = (Command) objIn.readObject();
+        ICommand ICommand = new Register(user);
+        objOut.writeObject(ICommand);
+        ICommand o = (ICommand) objIn.readObject();
         if (o instanceof Response response){{
             if (response.code() == CodeResponse.ERROR){
                 System.out.println(response.message());
@@ -60,11 +62,11 @@ public class EmailClient1 implements EmailClient{
             Socket socket = new Socket(host, port);
             ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
-            message.setSenderAddress(user);
+            message.setSenderAddress(user.email());
 
-            Command command = new SendEmail(message, recipient);
-            objOut.writeObject(command);
-            Command o = (Command) objIn.readObject();
+            ICommand ICommand = new SendEmail(user, message, recipient);
+            objOut.writeObject(ICommand);
+            ICommand o = (ICommand) objIn.readObject();
             if (o instanceof Response response){{
                 if (response.code() == CodeResponse.ERROR){
                     System.out.println(response.message());
@@ -84,9 +86,9 @@ public class EmailClient1 implements EmailClient{
             ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
 
-            Command command = new LoadEmails(user);
-            objOut.writeObject(command);
-            Command o = (Command) objIn.readObject();
+            ICommand ICommand = new LoadEmails(user);
+            objOut.writeObject(ICommand);
+            ICommand o = (ICommand) objIn.readObject();
             if (o instanceof Response response){{
                 switch (response.code()) {
                     case OK -> {

@@ -2,13 +2,15 @@ package ru.ifmo.email.server;
 
 import ru.ifmo.email.communication.*;
 import ru.ifmo.email.model.Message;
+import ru.ifmo.email.model.User;
+import ru.ifmo.email.server.storage.DbStorage;
+import ru.ifmo.email.server.storage.Storage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -21,7 +23,7 @@ public class Server implements AutoCloseable {
         }
     }
 
-    private HashMap<String, Client> clients;
+    private Storage storage;
 
     private static class Waite{
 
@@ -50,7 +52,7 @@ public class Server implements AutoCloseable {
 
         this.port = port;
 
-        clients = new HashMap<>();
+        storage = new DbStorage();
     }
 
     public synchronized void start() {
@@ -117,39 +119,40 @@ public class Server implements AutoCloseable {
                  final var objIn = new ObjectInputStream(socket.getInputStream());
                  final var objOut = new ObjectOutputStream(socket.getOutputStream())) {
                 while (!isInterrupted()) {
-                    final Command command = (Command) objIn.readObject();
+                    final ICommand ICommand = (ICommand) objIn.readObject();
+                    //
                     //тут команды
-                    if (command instanceof Register register){
-                        String email = register.getEmail();
-                        if (clients.containsKey(email)){
-                            System.out.println("error register user: " + email);
-                            final Command response = new Response(CodeResponse.ERROR, "error register user: " + email);
+                    if (ICommand instanceof Register register){
+                        User user = register.getUser();
+                        if (storage.isUser(user)){
+                            System.out.println("error register user: " + user.email());
+                            final ICommand response = new Response(CodeResponse.ERROR, "error register user: " + user.email());
                             objOut.writeObject(response);
                         } else {
-                            System.out.println("register user: " + email);
-                            clients.put(email, new Client(email));
-                            final Command response = new Response(CodeResponse.OK, "");
+                            System.out.println("register user: " + user.email());
+                            storage.addUser(user, "");
+                            final ICommand response = new Response(CodeResponse.OK, "");
                             objOut.writeObject(response);
                         }
-                    } else if (command instanceof SendEmail sendEmail){
-                        String email = sendEmail.getRecipient();
-                        if (clients.containsKey(email)){
-                            clients.get(email).addMessage(sendEmail.getMessage());
-                            final Command response = new Response(CodeResponse.OK, "");
+                    } else if (ICommand instanceof SendEmail sendEmail){
+                        User user = sendEmail.getUser();
+                        if (storage.isUser(user)){
+                            storage.addMessage(user, sendEmail.getMessage());
+                            final ICommand response = new Response(CodeResponse.OK, "");
                             objOut.writeObject(response);
                         } else {
-                            final Command response = new Response(CodeResponse.ERROR, "user is not registered");
+                            final ICommand response = new Response(CodeResponse.ERROR, "user is not registered");
                             objOut.writeObject(response);
                         }
                     }
-                    else if (command instanceof LoadEmails emails){
-                        String email = emails.getEmail();
-                        if (clients.containsKey(email)){
-                            List<Message> messages = clients.get(email).getMessages();
-                            final Command response = new Response(CodeResponse.OK, "", messages);
+                    else if (ICommand instanceof LoadEmails emails){
+                        User user = emails.getUser();
+                        if (storage.isUser(user)){
+                            List<Message> messages = storage.getMessage(user);
+                            final ICommand response = new Response(CodeResponse.OK, "", messages);
                             objOut.writeObject(response);
                         } else {
-                            final Command response = new Response(CodeResponse.ERROR, "user is not registered");
+                            final ICommand response = new Response(CodeResponse.ERROR, "user is not registered");
                             objOut.writeObject(response);
                         }
                     }

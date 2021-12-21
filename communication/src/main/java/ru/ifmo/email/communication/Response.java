@@ -1,10 +1,8 @@
 package ru.ifmo.email.communication;
 
-import java.io.Serial;
 import java.io.Serializable;
-import java.util.Objects;
 
-public final class Response implements Command, Serializable {
+public final class Response implements ICommand {
 
     private final CodeResponse code;
     private final String message;

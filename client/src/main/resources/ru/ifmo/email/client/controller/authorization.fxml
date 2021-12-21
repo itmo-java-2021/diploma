@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="CENTER" prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.ifmo.email.client.controller.AuthorizationController">
+  <HBox alignment="CENTER">
+      <VBox alignment="CENTER">
+          <children>
+              <Label text="Login">
+                  <font>
+                      <Font name="System Bold" size="15.0" />
+                  </font>
+              </Label>
+              <TextField fx:id="login" promptText="Login" />
+              <PasswordField fx:id="password" promptText="Password">
+                  <VBox.margin>
+                      <Insets top="5.0" />
+                  </VBox.margin></PasswordField>
+              <HBox alignment="CENTER">
+                  <children>
+                      <Button mnemonicParsing="false" onAction="#logIn" prefWidth="202" text="Log In">
+                          <HBox.margin>
+                              <Insets />
+                          </HBox.margin></Button>
+                  </children>
+                  <VBox.margin>
+                      <Insets top="5.0" />
+                  </VBox.margin>
+              </HBox>
+              <Pane>
+                  <children>
+                      <Hyperlink onAction="#register" text="register" />
+                  </children>
+                  <VBox.margin>
+                      <Insets />
+                  </VBox.margin>
+              </Pane>
+          </children>
+      </VBox>
+  </HBox>
+</VBox>

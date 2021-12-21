@@ -1,14 +1,16 @@
 package ru.ifmo.email.communication;
 
 import ru.ifmo.email.model.Message;
+import ru.ifmo.email.model.User;
 
 import java.io.Serializable;
 
-public class SendEmail implements Serializable, Command {
+public class SendEmail extends Command {
     private final Message message;
     private final String recipient;
 
-    public SendEmail(Message message, String recipient) {
+    public SendEmail(User user, Message message, String recipient) {
+        super(user);
         this.message = message;
         this.recipient = recipient;
     }
