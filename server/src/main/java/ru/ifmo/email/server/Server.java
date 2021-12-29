@@ -122,15 +122,17 @@ public class Server implements AutoCloseable {
                     final ICommand ICommand = (ICommand) objIn.readObject();
                     //
                     //тут команды
-                    if (ICommand instanceof Register register){
-                        User user = register.getUser();
+                    if (ICommand instanceof LogIn logIn){
+
+                    } else if (ICommand instanceof Registration registration){
+                        User user = registration.getUser();
                         if (storage.isUser(user)){
                             System.out.println("error register user: " + user.email());
                             final ICommand response = new Response(CodeResponse.ERROR, "error register user: " + user.email());
                             objOut.writeObject(response);
                         } else {
                             System.out.println("register user: " + user.email());
-                            storage.addUser(user, "");
+                            storage.addUser(user, registration.getPassword());
                             final ICommand response = new Response(CodeResponse.OK, "");
                             objOut.writeObject(response);
                         }

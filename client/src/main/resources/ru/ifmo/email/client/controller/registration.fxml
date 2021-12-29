@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.ifmo.email.client.controller.RegistrationController">
+    <GridPane alignment="CENTER" prefHeight="150.0" prefWidth="250.0">
+        <VBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS">
+            <HBox>
+                <TextField fx:id="email" promptText="Email" HBox.hgrow="ALWAYS" />
+                <TextField fx:id="server" editable="false" prefWidth="80.0" text="\@miv.com" />
+            </HBox>
+            <TextField fx:id="fio" promptText="FIO" />
+            <TextField fx:id="password" promptText="Password" />
+         <GridPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </GridPane.margin>
+        </VBox>
+        <HBox alignment="TOP_RIGHT" GridPane.columnIndex="0" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="BOTTOM">
+            <Button defaultButton="true" prefWidth="52" text="ok" onAction="#registration">
+            <HBox.margin>
+               <Insets right="5.0" />
+            </HBox.margin></Button>
+            <Button prefWidth="52" text="cancel" />
+         <GridPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </GridPane.margin>
+        </HBox>
+      <columnConstraints>
+         <ColumnConstraints />
+      </columnConstraints>
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
+    </GridPane>
+</AnchorPane>

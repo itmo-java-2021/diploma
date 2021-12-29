@@ -55,7 +55,6 @@ public class DbStorage implements Storage{
         catch (Exception e){
             e.printStackTrace();
         }
-
         return false;
     }
 
@@ -68,5 +67,52 @@ public class DbStorage implements Storage{
     public List<Message> getMessage(User user) {
 
         return null;
+    }
+
+    @Override
+    public User getUser(String email){
+        try(Connection con = DataSource.getConnection())
+        {
+            try (PreparedStatement prepared = con.prepareStatement("SELECT email, password, name FROM \"user\" where \"email\" = ?;")) {
+
+                prepared.setString(1, email);
+                try (ResultSet rs = prepared.executeQuery()) {
+                    while (rs.next()){
+                        String email1 = rs.getString("email");
+                        String password = rs.getString("password");
+                        String name = rs.getString("name");
+                    }
+                }
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Boolean logIn(String email, String password) {
+        Boolean result = false;
+        try(Connection con = DataSource.getConnection())
+        {
+            try (PreparedStatement prepared = con.prepareStatement("SELECT email, password, name FROM \"user\" where \"email\" = ? limit 1;")) {
+
+                prepared.setString(1, email);
+                try (ResultSet rs = prepared.executeQuery()) {
+                    while (rs.next()){
+                        if (rs.getString("password") == password){
+                            result = true;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        return result;
     }
 }

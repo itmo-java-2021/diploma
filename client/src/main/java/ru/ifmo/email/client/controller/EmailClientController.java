@@ -7,7 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import ru.ifmo.email.client.EmailClient;
+import ru.ifmo.email.client.IEmailClient;
 import ru.ifmo.email.client.exception.EmailClientException;
 import ru.ifmo.email.model.Message;
 
@@ -27,17 +27,17 @@ public class EmailClientController {
     @FXML
     private Accordion accInbox;
 
-    private final EmailClient emailClient;
+    private final IEmailClient IEmailClient;
 
-    public EmailClientController(EmailClient emailClient) {
-        this.emailClient = emailClient;
+    public EmailClientController(IEmailClient IEmailClient) {
+        this.IEmailClient = IEmailClient;
     }
 
     @FXML
     protected void onSendEmailButtonClick() {
         final Message msg = new Message(null, fldMsgTitle.getText(), txtEmailContent.getText());
         try {
-            emailClient.send(msg, fldEmailAddress.getText());
+            IEmailClient.send(msg, fldEmailAddress.getText());
             fldEmailAddress.clear();
             txtEmailContent.clear();
             fldMsgTitle.clear();
@@ -50,7 +50,7 @@ public class EmailClientController {
     @FXML
     protected void onRefreshButtonClick() {
         try {
-            final List<Message> messages = emailClient.loadEmails();
+            final List<Message> messages = IEmailClient.loadEmails();
             accInbox.getPanes().clear();
             messages.forEach(msg -> {
                 final Text txtContent = new Text(msg.getContent());
