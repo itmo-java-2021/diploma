@@ -3,6 +3,7 @@ package ru.ifmo.email.model;
 import java.io.Serializable;
 
 public class Message implements Serializable {
+    private int id;
     private String senderAddress;
     private String title;
     private String content;
@@ -11,6 +12,11 @@ public class Message implements Serializable {
         this.senderAddress = senderAddress;
         this.title = title;
         this.content = content;
+        this.id = 0;
+    }
+    public Message(int id, String senderAddress, String title, String content) {
+        this(senderAddress, title, content);
+        this.id = id;
     }
 
     public String getSenderAddress() {
@@ -35,5 +41,9 @@ public class Message implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public int getId() {
+        return id;
     }
 }

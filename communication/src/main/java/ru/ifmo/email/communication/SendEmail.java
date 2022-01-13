@@ -5,12 +5,11 @@ import ru.ifmo.email.model.User;
 
 import java.io.Serializable;
 
-public class SendEmail extends Command {
+public class SendEmail implements ICommand {
     private final Message message;
     private final String recipient;
 
-    public SendEmail(User user, Message message, String recipient) {
-        super(user);
+    public SendEmail(Message message, String recipient) {
         this.message = message;
         this.recipient = recipient;
     }

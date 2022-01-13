@@ -9,8 +9,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ifmo.email.client.Properties;
 import ru.ifmo.email.communication.*;
 import ru.ifmo.email.model.User;
@@ -24,18 +27,23 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class AuthorizationController implements Initializable {
+    private final static Logger log = LoggerFactory.getLogger(AuthorizationController.class);
+
     private boolean result;
     private User user;
     private Stage stage;
 
     @FXML
-    private TextField login;
+    private TextField email;
 
     @FXML
     private TextField password;
 
     @FXML
     private ImageView imageView;
+
+    @FXML
+    private Pane pane;
 
     public AuthorizationController(Stage stage) {
         this.stage = stage;
@@ -45,6 +53,12 @@ public class AuthorizationController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/Settings_16x.png")));
         imageView.setImage(image);
+
+
+        log.info("test");
+        log.debug("test");
+        log.warn("test");
+        log.error("test");
     }
 
     @FXML
@@ -64,7 +78,7 @@ public class AuthorizationController implements Initializable {
 
     @FXML
     protected void logIn() {
-        ICommand command = new LogIn(login.getText(), password.getText());
+        ICommand command = new LogIn(email.getText(), password.getText());
         try(Socket socket = new Socket(Properties.getProperties().getHost(), Properties.getProperties().getPort())) {
             ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
@@ -73,19 +87,14 @@ public class AuthorizationController implements Initializable {
             ICommand o = (ICommand) objIn.readObject();
             if (o instanceof Response response){{
                 if (response.code() == CodeResponse.OK){
-
-                    result = true;
-                    stage.close();
+                    if (response.o() instanceof User user){
+                        this.user = user;
+                        result = true;
+                        stage.close();
+                    }
                 } else if (response.code() == CodeResponse.LOGINFAILED){
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("WARNING");
-                    alert.setHeaderText("login failed");
-                    alert.setContentText(response.message());
-                    alert.showAndWait().ifPresent(rs -> {
-                        if (rs == ButtonType.OK) {
-                            System.out.println("Pressed OK.");
-                        }
-                    });
+                    pane.setVisible(true);
+                    pane.setPrefHeight(Pane.USE_COMPUTED_SIZE);
                 } else {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("ERROR");

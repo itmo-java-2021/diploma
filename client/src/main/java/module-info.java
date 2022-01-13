@@ -8,6 +8,7 @@ module ru.ifmo.email.emailclient {
 
     requires ru.ifmo.email.model;
     requires ru.ifmo.email.communication;
+    requires org.slf4j;
 
     opens ru.ifmo.email.client to javafx.fxml;
     exports ru.ifmo.email.client;

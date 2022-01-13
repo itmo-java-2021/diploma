@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane alignment="TOP_CENTER" prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.ifmo.email.client.controller.AuthorizationController">
+<GridPane alignment="TOP_CENTER" prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.ifmo.email.client.controller.AuthorizationController">
    <MenuBar nodeOrientation="RIGHT_TO_LEFT" style="-fx-background-color: transparant;">
      <menus>
        <Menu mnemonicParsing="false" onAction="#setting">
@@ -29,6 +29,14 @@
                   <VBox.margin>
                       <Insets top="5.0" />
                   </VBox.margin></PasswordField>
+            <Pane visible="false" prefHeight="0" fx:id="pane">
+               <children>
+                  <Label text="Wrong login or password" textFill="RED" />
+               </children>
+               <VBox.margin>
+                  <Insets left="5.0" top="5.0" />
+               </VBox.margin>
+            </Pane>
               <HBox alignment="CENTER">
                   <children>
                       <Button defaultButton="true" mnemonicParsing="false" onAction="#logIn" prefWidth="202" text="Log In">

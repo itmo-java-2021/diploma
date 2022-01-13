@@ -12,5 +12,5 @@ public interface Storage {
     void addMessage(User user, Message message);
     List<Message> getMessage(User user);
     User getUser(String email);
-    Boolean logIn(String email, String password);
+    User logIn(String email, String password);
 }

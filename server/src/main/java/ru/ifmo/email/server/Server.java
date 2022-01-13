@@ -123,7 +123,14 @@ public class Server implements AutoCloseable {
                     //
                     //тут команды
                     if (ICommand instanceof LogIn logIn){
-
+                        User user = storage.logIn(logIn.email(), logIn.password());
+                        if (user != null){
+                            final ICommand response = new Response(CodeResponse.OK, "", user);
+                            objOut.writeObject(response);
+                        } else {
+                            final ICommand response = new Response(CodeResponse.LOGINFAILED, "wrong login or password");
+                            objOut.writeObject(response);
+                        }
                     } else if (ICommand instanceof Registration registration){
                         User user = registration.getUser();
                         if (storage.isUser(user)){
@@ -137,8 +144,8 @@ public class Server implements AutoCloseable {
                             objOut.writeObject(response);
                         }
                     } else if (ICommand instanceof SendEmail sendEmail){
-                        User user = sendEmail.getUser();
-                        if (storage.isUser(user)){
+                        User user = storage.getUser(sendEmail.getRecipient());
+                        if (user != null){
                             storage.addMessage(user, sendEmail.getMessage());
                             final ICommand response = new Response(CodeResponse.OK, "");
                             objOut.writeObject(response);

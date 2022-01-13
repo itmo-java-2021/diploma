@@ -47,7 +47,7 @@ public class RegistrationController implements Initializable {
         ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
         ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
 
-        ICommand ICommand = new Registration(new User(fio.getText(), email.getText() + server.getText()), password.getText());
+        ICommand ICommand = new Registration(new User(0, fio.getText(), email.getText() + server.getText()), password.getText());
         objOut.writeObject(ICommand);
         ICommand o = (ICommand) objIn.readObject();
         if (o instanceof Response response){{

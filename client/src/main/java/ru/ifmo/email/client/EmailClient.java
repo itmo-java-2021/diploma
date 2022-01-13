@@ -30,7 +30,7 @@ public class EmailClient implements IEmailClient {
             ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
             message.setSenderAddress(user.email());
 
-            ICommand ICommand = new SendEmail(user, message, recipient);
+            ICommand ICommand = new SendEmail(message, recipient);
             objOut.writeObject(ICommand);
             ICommand o = (ICommand) objIn.readObject();
             if (o instanceof Response response){{

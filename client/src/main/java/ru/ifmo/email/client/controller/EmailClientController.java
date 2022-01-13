@@ -1,6 +1,9 @@
 package ru.ifmo.email.client.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -11,9 +14,15 @@ import ru.ifmo.email.client.IEmailClient;
 import ru.ifmo.email.client.exception.EmailClientException;
 import ru.ifmo.email.model.Message;
 
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class EmailClientController {
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
+
+public class EmailClientController implements Initializable {
+    private final static Logger log = LoggerFactory.getLogger(EmailClientController.class);
 
     @FXML
     private TextField fldEmailAddress;
@@ -49,30 +58,56 @@ public class EmailClientController {
 
     @FXML
     protected void onRefreshButtonClick() {
+        class MessagePane extends TitledPane{
+            public final int id;
+
+            public MessagePane(int id) {
+                this.id = id;
+            }
+
+            public MessagePane(int id, String s, Node node) {
+                super(s, node);
+                this.id = id;
+            }
+        }
+
         try {
             final List<Message> messages = IEmailClient.loadEmails();
-            accInbox.getPanes().clear();
-            messages.forEach(msg -> {
+            //accInbox.getPanes().clear();
+            var vs = accInbox.getPanes().parallelStream().map(titledPane -> ((MessagePane)titledPane).id).toList();
+            var messages2 = messages.parallelStream().filter(message -> !vs.contains(message.getId())).toList();
+            messages2.forEach(msg -> {
                 final Text txtContent = new Text(msg.getContent());
                 txtContent.setTextAlignment(TextAlignment.LEFT);
-
-                final TitledPane titledPane = new TitledPane("From %s Title: %s".formatted(msg.getSenderAddress(), msg.getTitle()), txtContent);
+                final TitledPane titledPane = new MessagePane(msg.getId(), "From %s Title: %s".formatted(msg.getSenderAddress(), msg.getTitle()), txtContent);
                 titledPane.setTextAlignment(TextAlignment.LEFT);
 
-                accInbox.getPanes().add(titledPane);
+                Platform.runLater(() -> {
+                    accInbox.getPanes().add(titledPane);
+                });
             });
         } catch (EmailClientException e) {
-            // Добавить логгер!
             e.printStackTrace();
         }
     }
 
     @FXML
     protected void onClearButtonClick() {
-        // todo сделать очистку на сервере
         accInbox.getPanes().clear();
+    }
 
-        // todo а потом перезагрузить письма
-//        onRefreshButtonClick();
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        Thread thread = new Thread(() -> {
+            try {
+                while (true){
+                    onRefreshButtonClick();
+                    Thread.sleep(5000);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        thread.start();
     }
 }
