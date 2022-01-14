@@ -6,11 +6,17 @@ import ru.ifmo.email.model.User;
 import ru.ifmo.email.server.storage.DbStorage;
 import ru.ifmo.email.server.storage.Storage;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.*;
 import java.util.List;
 import java.util.Scanner;
 
@@ -24,6 +30,7 @@ public class Server implements AutoCloseable {
     }
 
     private Storage storage;
+    private KeyPair keyPair;
 
     private static class Waite{
 
@@ -50,8 +57,15 @@ public class Server implements AutoCloseable {
 
     public Server(int port) {
 
-        this.port = port;
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            generator.initialize(1024);
+            keyPair = generator.generateKeyPair();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
 
+        this.port = port;
         storage = new DbStorage();
     }
 
@@ -123,7 +137,7 @@ public class Server implements AutoCloseable {
                     //
                     //тут команды
                     if (ICommand instanceof LogIn logIn){
-                        User user = storage.logIn(logIn.email(), logIn.password());
+                        User user = storage.logIn(logIn.email(), decrypt(logIn.password()));
                         if (user != null){
                             final ICommand response = new Response(CodeResponse.OK, "", user);
                             objOut.writeObject(response);
@@ -139,7 +153,7 @@ public class Server implements AutoCloseable {
                             objOut.writeObject(response);
                         } else {
                             System.out.println("register user: " + user.email());
-                            storage.addUser(user, registration.getPassword());
+                            storage.addUser(user, decrypt(registration.getPassword()));
                             final ICommand response = new Response(CodeResponse.OK, "");
                             objOut.writeObject(response);
                         }
@@ -164,6 +178,11 @@ public class Server implements AutoCloseable {
                             final ICommand response = new Response(CodeResponse.ERROR, "user is not registered");
                             objOut.writeObject(response);
                         }
+                    } else if (ICommand instanceof GetPublicKey getPublicKey){
+                        //PublicKey key = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytes));
+                        byte[] bytes = keyPair.getPublic().getEncoded();
+                        final ICommand response = new Response(CodeResponse.OK, "", bytes);
+                        objOut.writeObject(response);
                     }
                     interrupt();
                 }
@@ -184,6 +203,19 @@ public class Server implements AutoCloseable {
             if (socket != null) {
                 socket.close();
             }
+        }
+
+        private String decrypt(byte[] bytes) {
+            try{
+                Cipher cipher = Cipher.getInstance("RSA");
+                cipher.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
+                byte[] data = cipher.doFinal(bytes);
+                return new String(data);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 }

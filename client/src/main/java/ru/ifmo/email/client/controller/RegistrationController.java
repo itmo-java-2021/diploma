@@ -6,6 +6,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import ru.ifmo.email.client.Encryption;
 import ru.ifmo.email.client.Properties;
 import ru.ifmo.email.communication.CodeResponse;
 import ru.ifmo.email.communication.ICommand;
@@ -47,7 +48,7 @@ public class RegistrationController implements Initializable {
         ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
         ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
 
-        ICommand ICommand = new Registration(new User(0, fio.getText(), email.getText() + server.getText()), password.getText());
+        ICommand ICommand = new Registration(new User(0, fio.getText(), email.getText() + server.getText()), Encryption.encrypted(password.getText()));
         objOut.writeObject(ICommand);
         ICommand o = (ICommand) objIn.readObject();
         if (o instanceof Response response){{

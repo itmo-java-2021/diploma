@@ -5,14 +5,14 @@ import ru.ifmo.email.model.User;
 import java.io.Serializable;
 
 public class Registration extends Command {
-    private final String password;
+    private final byte[] password;
 
-    public Registration(User user, String password) {
+    public Registration(User user, byte[] password) {
         super(user);
         this.password = password;
     }
 
-    public String getPassword() {
+    public byte[] getPassword() {
         return password;
     }
 }

@@ -14,15 +14,23 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.ifmo.email.client.Encryption;
 import ru.ifmo.email.client.Properties;
 import ru.ifmo.email.communication.*;
 import ru.ifmo.email.model.User;
 
+import javax.crypto.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -53,12 +61,7 @@ public class AuthorizationController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/Settings_16x.png")));
         imageView.setImage(image);
-
-
-        log.info("test");
-        log.debug("test");
-        log.warn("test");
-        log.error("test");
+        log.info("initialize");
     }
 
     @FXML
@@ -78,27 +81,30 @@ public class AuthorizationController implements Initializable {
 
     @FXML
     protected void logIn() {
-        ICommand command = new LogIn(email.getText(), password.getText());
         try(Socket socket = new Socket(Properties.getProperties().getHost(), Properties.getProperties().getPort())) {
             ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
+            ICommand o;
 
-            objOut.writeObject(command);
-            ICommand o = (ICommand) objIn.readObject();
+            objOut.writeObject(new LogIn(email.getText(), Encryption.encrypted(password.getText())));
+            o = (ICommand) objIn.readObject();
             if (o instanceof Response response){{
                 if (response.code() == CodeResponse.OK){
                     if (response.o() instanceof User user){
                         this.user = user;
                         result = true;
                         stage.close();
+                        log.info("logIn: {}", user.email());
                     }
                 } else if (response.code() == CodeResponse.LOGINFAILED){
                     pane.setVisible(true);
                     pane.setPrefHeight(Pane.USE_COMPUTED_SIZE);
+                    log.info("login failed: {}", email.getText());
                 } else {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("ERROR");
-                    alert.setHeaderText("error");
+                    log.warn(response.message());
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    alert.setTitle("warning");
+                    alert.setHeaderText("warning");
                     alert.setContentText(response.message());
                     alert.showAndWait().ifPresent(rs -> {
                         if (rs == ButtonType.OK) {
@@ -107,9 +113,8 @@ public class AuthorizationController implements Initializable {
                     });
                 }
             }}
-
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error(null, e);
         }
     }
 
