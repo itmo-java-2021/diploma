@@ -8,3 +8,5 @@
 /communication/target/
 /model/target/
 /server/target/
+/log/client.log
+/log/server.log
