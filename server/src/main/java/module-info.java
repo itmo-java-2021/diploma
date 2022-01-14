@@ -5,6 +5,7 @@ module ru.ifmo.email.server {
     requires java.desktop;
     requires c3p0;
     requires java.naming;
+    requires bcrypt;
 
     exports ru.ifmo.email.server;
     opens ru.ifmo.email.server;

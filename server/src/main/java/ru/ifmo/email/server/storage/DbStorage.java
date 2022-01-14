@@ -1,5 +1,6 @@
 package ru.ifmo.email.server.storage;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import ru.ifmo.email.model.Message;
 import ru.ifmo.email.model.User;
 
@@ -19,7 +20,8 @@ public class DbStorage implements Storage{
 
                 prepared.setString(1, user.name());
                 prepared.setString(2, user.email());
-                prepared.setString(3, password);
+                String bcryptHashString = BCrypt.withDefaults().hashToString(12, password.toCharArray());
+                prepared.setString(3, bcryptHashString);
                 prepared.executeUpdate();
             }
         }
@@ -101,7 +103,7 @@ public class DbStorage implements Storage{
     @Override
     public User logIn(String email, String password) {
         RUser rUser = getRUser(email);
-        if (rUser != null && password.equals(rUser.password)){
+        if (rUser != null && BCrypt.verifyer().verify(password.toCharArray(), rUser.password).verified){
             return new User(rUser.id, rUser.name, rUser.email);
         }
         return null;

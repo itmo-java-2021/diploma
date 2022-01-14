@@ -29,11 +29,17 @@
         <hibernate.version>5.6.1.Final</hibernate.version>
         <slf4j.version>1.7.32</slf4j.version>
         <junit.jupiter.version>5.8.1</junit.jupiter.version>
+        <bcrypt>0.9.0</bcrypt>
     </properties>
 
     <dependencyManagement>
-
         <dependencies>
+            <dependency>
+                <groupId>at.favre.lib</groupId>
+                <artifactId>bcrypt</artifactId>
+                <version>${bcrypt}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
