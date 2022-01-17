@@ -1,6 +1,9 @@
 package ru.ifmo.email.server.storage;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.ifmo.email.server.Server;
 
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
@@ -10,6 +13,8 @@ import java.sql.SQLException;
  * Created by xmitya on 17.01.17.
  */
 public class DataSource {
+    private final static Logger log = LoggerFactory.getLogger(DataSource.class);
+
     private static volatile DataSource dataSource;
     private ComboPooledDataSource cpds;
 

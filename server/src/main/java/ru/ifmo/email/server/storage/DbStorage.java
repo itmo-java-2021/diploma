@@ -1,6 +1,8 @@
 package ru.ifmo.email.server.storage;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ifmo.email.model.Message;
 import ru.ifmo.email.model.User;
 
@@ -11,9 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DbStorage implements Storage{
+    private final static Logger log = LoggerFactory.getLogger(DbStorage.class);
 
     @Override
     public void addUser(User user, String password) {
+        log.info("add user {}", user.email());
         try(Connection con = DataSource.getConnection())
         {
             try (PreparedStatement prepared = con.prepareStatement("INSERT INTO \"user\" (\"name\", \"email\", \"password\") VALUES (?, ?, ?);")) {
@@ -26,12 +30,13 @@ public class DbStorage implements Storage{
             }
         }
         catch (Exception e){
-            e.printStackTrace();
+            log.error(null, e);
         }
     }
 
     @Override
     public boolean isUser(User user) {
+        log.info("is user {}", user.email());
         try(Connection con = DataSource.getConnection())
         {
             try (PreparedStatement prepared = con.prepareStatement("SELECT count(*) FROM \"user\" where \"email\" = ?;")) {
@@ -45,13 +50,14 @@ public class DbStorage implements Storage{
             }
         }
         catch (Exception e){
-            e.printStackTrace();
+            log.error(null, e);
         }
         return false;
     }
 
     @Override
     public void addMessage(User user, Message message) {
+        log.info("add message");
         try(Connection con = DataSource.getConnection())
         {
             try (PreparedStatement prepared = con.prepareStatement("INSERT INTO \"message\" (\"title\", \"text\", \"senderAddress\", \"id_user\") VALUES (?, ?, ?, ?);")) {
@@ -64,12 +70,13 @@ public class DbStorage implements Storage{
             }
         }
         catch (Exception e){
-            e.printStackTrace();
+            log.error(null, e);
         }
     }
 
     @Override
     public List<Message> getMessage(User user) {
+        log.info("get message");
         List<Message> messages = new ArrayList<>();
         try(Connection con = DataSource.getConnection())
         {
@@ -85,13 +92,14 @@ public class DbStorage implements Storage{
             }
         }
         catch (Exception e){
-            e.printStackTrace();
+            log.error(null, e);
         }
         return messages;
     }
 
     @Override
     public User getUser(String email){
+        log.info("getUser");
         RUser rUser = getRUser(email);
         if (rUser == null){
             return null;
@@ -102,6 +110,7 @@ public class DbStorage implements Storage{
 
     @Override
     public User logIn(String email, String password) {
+        log.info("logIn");
         RUser rUser = getRUser(email);
         if (rUser != null && BCrypt.verifyer().verify(password.toCharArray(), rUser.password).verified){
             return new User(rUser.id, rUser.name, rUser.email);

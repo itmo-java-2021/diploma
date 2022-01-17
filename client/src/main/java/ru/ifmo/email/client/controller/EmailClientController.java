@@ -44,6 +44,7 @@ public class EmailClientController implements Initializable {
 
     @FXML
     protected void onSendEmailButtonClick() {
+        log.info("send email: {}", fldEmailAddress.getText());
         final Message msg = new Message(null, fldMsgTitle.getText(), txtEmailContent.getText());
         try {
             IEmailClient.send(msg, fldEmailAddress.getText());
@@ -51,8 +52,7 @@ public class EmailClientController implements Initializable {
             txtEmailContent.clear();
             fldMsgTitle.clear();
         } catch (EmailClientException e) {
-            // Использовать логгер!
-            e.printStackTrace();
+            log.error(null, e);
         }
     }
 
@@ -87,7 +87,7 @@ public class EmailClientController implements Initializable {
                 });
             });
         } catch (EmailClientException e) {
-            e.printStackTrace();
+            log.error(null, e);
         }
     }
 
@@ -98,6 +98,7 @@ public class EmailClientController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        log.info("initialize");
         Thread thread = new Thread(() -> {
             try {
                 while (true){

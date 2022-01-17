@@ -1,5 +1,7 @@
 package ru.ifmo.email.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ifmo.email.communication.*;
 import ru.ifmo.email.model.Message;
 import ru.ifmo.email.model.User;
@@ -28,6 +30,8 @@ public class Server implements AutoCloseable {
             waite.waite();
         }
     }
+
+    private final static Logger log = LoggerFactory.getLogger(Server.class);
 
     private Storage storage;
     private KeyPair keyPair;
@@ -88,6 +92,7 @@ public class Server implements AutoCloseable {
     }
 
     private class ConnectionListener extends Thread implements AutoCloseable {
+        private final static Logger log = LoggerFactory.getLogger(ConnectionListener.class);
         private ServerSocket ssocket;
 
         @Override
@@ -104,7 +109,7 @@ public class Server implements AutoCloseable {
             } catch (IOException e) {
                 // Можем пропустить вывод ошибки в консоль, если мы знаем, что это был останов.
                 if (!isInterrupted()) {
-                    e.printStackTrace();
+                    log.error(null, e);
                 }
             }
         }
@@ -121,6 +126,7 @@ public class Server implements AutoCloseable {
     }
 
     private class ConnectionServer extends Thread implements AutoCloseable {
+        private final static Logger log = LoggerFactory.getLogger(ConnectionServer.class);
         private final Socket socket;
 
         private ConnectionServer(Socket socket) {
@@ -188,9 +194,9 @@ public class Server implements AutoCloseable {
                 }
 
             } catch (IOException e) {
-                System.err.println("Client " + socket.getInetAddress() + " disconnected");
+                log.error("Client " + socket.getInetAddress() + " disconnected");
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                log.error(null, e);
             } finally {
 
             }
@@ -213,7 +219,7 @@ public class Server implements AutoCloseable {
                 return new String(data);
             }
             catch (Exception e){
-                e.printStackTrace();
+                log.error(null, e);
             }
             return null;
         }

@@ -6,6 +6,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.ifmo.email.client.Encryption;
 import ru.ifmo.email.client.Properties;
 import ru.ifmo.email.communication.CodeResponse;
@@ -22,6 +24,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class RegistrationController implements Initializable {
+    private final static Logger log = LoggerFactory.getLogger(RegistrationController.class);
+
     private Stage stage;
 
     @FXML
@@ -39,11 +43,12 @@ public class RegistrationController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        log.info("initialize");
     }
 
     @FXML
     protected void registration() throws IOException, ClassNotFoundException {
+        log.info("registration");
         Socket socket = new Socket(Properties.getProperties().getHost(), Properties.getProperties().getPort());
         ObjectOutputStream objOut = new ObjectOutputStream(socket.getOutputStream());
         ObjectInputStream objIn = new ObjectInputStream(socket.getInputStream());
@@ -53,6 +58,7 @@ public class RegistrationController implements Initializable {
         ICommand o = (ICommand) objIn.readObject();
         if (o instanceof Response response){{
             if (response.code() == CodeResponse.ERROR){
+                log.error(response.message());
                 System.out.println(response.message());
 
                 Alert alert = new Alert(Alert.AlertType.WARNING);
