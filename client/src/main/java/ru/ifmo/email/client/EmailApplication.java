@@ -23,7 +23,7 @@ public class EmailApplication extends Application {
             final IEmailClient IEmailClient = new EmailClient(user);
             // Всякая всячина для отрисовки пользовательского интерфейса.
             FXMLLoader fxmlLoader = new FXMLLoader(EmailClientController.class.getResource("email-client-view.fxml"));
-            fxmlLoader.setControllerFactory(c -> new EmailClientController(IEmailClient));
+            fxmlLoader.setControllerFactory(c -> new EmailClientController(IEmailClient, stage));
             Scene sendScene = new Scene(fxmlLoader.load());
             stage.setTitle("IFMO Email client: " + user.email());
             stage.setScene(sendScene);

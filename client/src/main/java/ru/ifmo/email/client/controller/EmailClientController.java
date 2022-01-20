@@ -1,6 +1,7 @@
 package ru.ifmo.email.client.controller;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -10,6 +11,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import ru.ifmo.email.client.IEmailClient;
 import ru.ifmo.email.client.exception.EmailClientException;
 import ru.ifmo.email.model.Message;
@@ -17,12 +20,15 @@ import ru.ifmo.email.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class EmailClientController implements Initializable {
     private final static Logger log = LoggerFactory.getLogger(EmailClientController.class);
+
+    private UpdateEmail updateEmail;
 
     @FXML
     private TextField fldEmailAddress;
@@ -38,8 +44,14 @@ public class EmailClientController implements Initializable {
 
     private final IEmailClient IEmailClient;
 
-    public EmailClientController(IEmailClient IEmailClient) {
+    public EmailClientController(IEmailClient IEmailClient, Stage stage) {
         this.IEmailClient = IEmailClient;
+        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                updateEmail.interrupt();
+            }
+        });
     }
 
     @FXML
@@ -99,16 +111,42 @@ public class EmailClientController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         log.info("initialize");
-        Thread thread = new Thread(() -> {
+//        Thread thread = new Thread(() -> {
+//            try {
+//                while (true){
+//                    onRefreshButtonClick();
+//                    Thread.sleep(5000);
+//                }
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        });
+//        thread.start();
+
+        updateEmail = new UpdateEmail();
+        updateEmail.start();
+    }
+
+    private class UpdateEmail extends Thread implements AutoCloseable{
+        @Override
+        public void run() {
             try {
-                while (true){
+                while (!isInterrupted()){
                     onRefreshButtonClick();
                     Thread.sleep(5000);
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
-        });
-        thread.start();
+            catch (InterruptedException e){
+
+            }
+            catch (Exception e) {
+                log.error(null, e);
+            }
+        }
+
+        @Override
+        public void close() throws Exception {
+            interrupt();
+        }
     }
 }

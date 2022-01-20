@@ -77,6 +77,7 @@ public class Server implements AutoCloseable {
         var listener = new ConnectionListener();
         listener.start();
         this.listener = listener;
+        log.info("start server, listen port {}", port);
     }
 
     public synchronized void stop() throws InterruptedException {
@@ -103,6 +104,7 @@ public class Server implements AutoCloseable {
                 while (!isInterrupted()) {
                     final Socket socket = ssocket.accept();
 
+                    log.info("connect: {}", socket.getInetAddress());
                     final ConnectionServer connectionServer = new ConnectionServer(socket);
                     connectionServer.start();
                 }
@@ -139,10 +141,11 @@ public class Server implements AutoCloseable {
                  final var objIn = new ObjectInputStream(socket.getInputStream());
                  final var objOut = new ObjectOutputStream(socket.getOutputStream())) {
                 while (!isInterrupted()) {
-                    final ICommand ICommand = (ICommand) objIn.readObject();
+                    final ICommand iCommand = (ICommand) objIn.readObject();
+                    log.info("run ICommand {}", iCommand.getClass());
                     //
                     //тут команды
-                    if (ICommand instanceof LogIn logIn){
+                    if (iCommand instanceof LogIn logIn){
                         User user = storage.logIn(logIn.email(), decrypt(logIn.password()));
                         if (user != null){
                             final ICommand response = new Response(CodeResponse.OK, "", user);
@@ -151,7 +154,7 @@ public class Server implements AutoCloseable {
                             final ICommand response = new Response(CodeResponse.LOGINFAILED, "wrong login or password");
                             objOut.writeObject(response);
                         }
-                    } else if (ICommand instanceof Registration registration){
+                    } else if (iCommand instanceof Registration registration){
                         User user = registration.getUser();
                         if (storage.isUser(user)){
                             System.out.println("error register user: " + user.email());
@@ -163,7 +166,7 @@ public class Server implements AutoCloseable {
                             final ICommand response = new Response(CodeResponse.OK, "");
                             objOut.writeObject(response);
                         }
-                    } else if (ICommand instanceof SendEmail sendEmail){
+                    } else if (iCommand instanceof SendEmail sendEmail){
                         User user = storage.getUser(sendEmail.getRecipient());
                         if (user != null){
                             storage.addMessage(user, sendEmail.getMessage());
@@ -174,7 +177,7 @@ public class Server implements AutoCloseable {
                             objOut.writeObject(response);
                         }
                     }
-                    else if (ICommand instanceof LoadEmails emails){
+                    else if (iCommand instanceof LoadEmails emails){
                         User user = emails.getUser();
                         if (storage.isUser(user)){
                             List<Message> messages = storage.getMessage(user);
@@ -184,7 +187,7 @@ public class Server implements AutoCloseable {
                             final ICommand response = new Response(CodeResponse.ERROR, "user is not registered");
                             objOut.writeObject(response);
                         }
-                    } else if (ICommand instanceof GetPublicKey getPublicKey){
+                    } else if (iCommand instanceof GetPublicKey getPublicKey){
                         //PublicKey key = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytes));
                         byte[] bytes = keyPair.getPublic().getEncoded();
                         final ICommand response = new Response(CodeResponse.OK, "", bytes);
