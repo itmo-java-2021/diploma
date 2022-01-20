@@ -77,4 +77,10 @@ public class RegistrationController implements Initializable {
 
         stage.close();
     }
+
+    @FXML
+    protected void cancel() throws IOException, ClassNotFoundException {
+        log.info("cancel");
+        stage.close();
+    }
 }

@@ -120,6 +120,22 @@ public class AuthorizationController implements Initializable {
 
     @FXML
     protected void setting() {
+        try{
+            Stage stage = new Stage();
+            ConfigController controller = new ConfigController(stage);
+            FXMLLoader fxmlLoader = new FXMLLoader(ConfigController.class.getResource("config.fxml"));
+            fxmlLoader.setControllerFactory(c -> controller);
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            //stage.initStyle(StageStyle.UNDECORATED);
+            stage.setTitle("authorization");
+            stage.showAndWait();
+        }
+        catch (Exception e){
+            log.error(null, e);
+        }
     }
 
     public boolean isResult() {

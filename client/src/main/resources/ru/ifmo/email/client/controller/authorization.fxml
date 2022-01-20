@@ -6,13 +6,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<GridPane alignment="TOP_CENTER" prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.ifmo.email.client.controller.AuthorizationController">
+<GridPane alignment="TOP_CENTER" prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.ifmo.email.client.controller.AuthorizationController">
    <MenuBar nodeOrientation="RIGHT_TO_LEFT" style="-fx-background-color: transparant;">
      <menus>
-       <Menu mnemonicParsing="false" onAction="#setting">
-            <graphic>
+       <Menu mnemonicParsing="false" onShown="#setting">
+           <graphic>
                <ImageView fx:id="imageView" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" />
-            </graphic>
+           </graphic>
+            <items>
+               <MenuItem mnemonicParsing="false"/>
+            </items>
        </Menu>
      </menus>
    </MenuBar>
@@ -24,12 +27,19 @@
                       <Font name="System Bold" size="15.0" />
                   </font>
               </Label>
-              <TextField fx:id="email" promptText="Email" />
+              <TextField fx:id="email" promptText="Email">
+                  <tooltip>
+                      <Tooltip text="Email" />
+                  </tooltip>
+              </TextField>
               <PasswordField fx:id="password" promptText="Password">
+                  <tooltip>
+                      <Tooltip text="Password" />
+                  </tooltip>
                   <VBox.margin>
                       <Insets top="5.0" />
                   </VBox.margin></PasswordField>
-            <Pane visible="false" prefHeight="0" fx:id="pane">
+            <Pane fx:id="pane" prefHeight="0" visible="false">
                <children>
                   <Label text="Wrong login or password" textFill="RED" />
                </children>
