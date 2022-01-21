@@ -59,7 +59,6 @@ public class RegistrationController implements Initializable {
         if (o instanceof Response response){{
             if (response.code() == CodeResponse.ERROR){
                 log.error(response.message());
-                System.out.println(response.message());
 
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("WARNING");
