@@ -23,6 +23,7 @@ import javax.crypto.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.URL;
 import java.security.InvalidKeyException;
@@ -67,6 +68,7 @@ public class AuthorizationController implements Initializable {
     @FXML
     protected void registration() throws IOException {
         Stage stage = new Stage();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/Mail_16x.png"))));
         RegistrationController controller = new RegistrationController(stage);
         FXMLLoader fxmlLoader = new FXMLLoader(RegistrationController.class.getResource("registration.fxml"));
         fxmlLoader.setControllerFactory(c -> controller);
@@ -113,7 +115,20 @@ public class AuthorizationController implements Initializable {
                     });
                 }
             }}
-        } catch (Exception e) {
+        }
+        catch (ConnectException e){
+            log.error(null, e);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("warning");
+            alert.setHeaderText("warning");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait().ifPresent(rs -> {
+                if (rs == ButtonType.OK) {
+                    System.out.println("Pressed OK.");
+                }
+            });
+        }
+        catch (Exception e) {
             log.error(null, e);
         }
     }
@@ -122,6 +137,7 @@ public class AuthorizationController implements Initializable {
     protected void setting() {
         try{
             Stage stage = new Stage();
+            stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/Mail_16x.png"))));
             ConfigController controller = new ConfigController(stage);
             FXMLLoader fxmlLoader = new FXMLLoader(ConfigController.class.getResource("config.fxml"));
             fxmlLoader.setControllerFactory(c -> controller);

@@ -3,6 +3,7 @@ package ru.ifmo.email.client;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ru.ifmo.email.client.controller.AuthorizationController;
@@ -11,6 +12,7 @@ import ru.ifmo.email.client.exception.EmailClientException;
 import ru.ifmo.email.model.User;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class EmailApplication extends Application {
     @Override
@@ -28,11 +30,13 @@ public class EmailApplication extends Application {
             stage.setTitle("IFMO Email client: " + user.email());
             stage.setScene(sendScene);
             stage.show();
+            stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/Mail_16x.png"))));
         }
     }
 
     private AuthorizationController logIn() throws IOException {
         Stage stage = new Stage();
+        stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/img/Mail_16x.png"))));
         AuthorizationController controller = new AuthorizationController(stage);
         FXMLLoader authorization = new FXMLLoader(AuthorizationController.class.getResource("authorization.fxml"));
         authorization.setControllerFactory(c -> controller);
