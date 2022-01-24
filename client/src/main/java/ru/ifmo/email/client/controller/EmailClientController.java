@@ -14,6 +14,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import ru.ifmo.email.client.IEmailClient;
+import ru.ifmo.email.client.Properties;
 import ru.ifmo.email.client.exception.EmailClientException;
 import ru.ifmo.email.model.Message;
 
@@ -43,9 +44,11 @@ public class EmailClientController implements Initializable {
     private Accordion accInbox;
 
     private final IEmailClient IEmailClient;
+    private final int updateTime;
 
     public EmailClientController(IEmailClient IEmailClient, Stage stage) {
         this.IEmailClient = IEmailClient;
+        this.updateTime = Properties.getProperties().getUpdateTime();
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
@@ -133,7 +136,7 @@ public class EmailClientController implements Initializable {
             try {
                 while (!isInterrupted()){
                     onRefreshButtonClick();
-                    Thread.sleep(5000);
+                    Thread.sleep(updateTime);
                 }
             }
             catch (InterruptedException e){

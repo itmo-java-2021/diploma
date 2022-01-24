@@ -20,6 +20,8 @@ public class Properties {
     private String host;
     private int port;
 
+    private int updateTime;
+
 
     private Properties() {
         properties1 = new java.util.Properties();
@@ -27,6 +29,7 @@ public class Properties {
             properties1.load(file);
             this.host = properties1.getProperty("host");
             this.port = Integer.parseInt(properties1.getProperty("port"));
+            this.updateTime = Integer.parseInt(properties1.getProperty("update_time"));
             log.info("get and read host: {}", host);
             log.info("get and read port: {}", port);
         } catch (IOException e) {
@@ -50,6 +53,10 @@ public class Properties {
     public int getPort() {
         log.info("get port: {}", port);
         return port;
+    }
+
+    public int getUpdateTime() {
+        return updateTime;
     }
 
     public void setHost(String host) {
